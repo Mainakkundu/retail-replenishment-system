@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "replenish"
+version = "0.1.0"
+description = "Hierarchical demand forecasting and replenishment decisions for Favorita."
+requires-python = ">=3.9"
+dependencies = [
+    "polars==1.32.2",
+    "pyarrow==21.0.0",
+    "pydantic==2.11.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.4.1",
+    "mypy==1.17.1",
+    "ruff==0.12.8",
+]
+data = [
+    "kaggle==1.7.4.5",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "ANN", "B", "C4", "SIM", "PLR"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+mypy_path = "src"
