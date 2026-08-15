@@ -8,6 +8,8 @@ version = "0.1.0"
 description = "Hierarchical demand forecasting and replenishment decisions for Favorita."
 requires-python = ">=3.9"
 dependencies = [
+    "numpy==2.0.2",
+    "pandas==2.3.1",
     "polars==1.32.2",
     "pyarrow==21.0.0",
     "pydantic==2.11.7",

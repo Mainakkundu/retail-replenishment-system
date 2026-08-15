@@ -387,7 +387,12 @@ if at all.
 
 ## 11. Engineering rules
 
-- **Polars or DuckDB.** Not pandas. Favorita melts to millions of rows.
+- **Pandas, NumPy, Polars or DuckDB are allowed.** Use pandas for clear tabular
+  analysis and notebook work, NumPy for numeric arrays and metric calculations,
+  and Polars or DuckDB when scans, joins, lazy execution or file-backed queries
+  are materially safer for large data. Favorita melts to millions of rows, so
+  pandas code must avoid unnecessary copies and must not hide memory-heavy
+  operations inside helpers.
 - **Config over constants.** Costs, lead times, shelf life, fold dates, seeds —
   one config module, typed.
 - **Seed everything.** Every run reproducible from its seed.
