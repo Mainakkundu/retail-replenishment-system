@@ -44,6 +44,21 @@ class OilNullValidator:
 
 
 @dataclass(frozen=True)
+class OilRawNullCountValidator:
+    oil: pl.DataFrame
+    config: DataQualityConfig
+
+    def validate(self) -> ValidationResult:
+        observed_nulls = self.oil.select(pl.col("dcoilwtico").null_count()).item()
+        passed = observed_nulls == self.config.expected_oil_nulls_before_fill
+        detail = (
+            f"observed={observed_nulls}, "
+            f"expected={self.config.expected_oil_nulls_before_fill}"
+        )
+        return ValidationResult("oil_raw_null_count", passed, detail)
+
+
+@dataclass(frozen=True)
 class DailyCalendarValidator:
     panel: pl.DataFrame
 
@@ -107,4 +122,3 @@ class LeadingZeroTruncationValidator:
         passed = invalid_rows == 0
         detail = f"pre_launch_zero_rows_remaining={invalid_rows}"
         return ValidationResult("leading_zero_truncation", passed, detail)
-

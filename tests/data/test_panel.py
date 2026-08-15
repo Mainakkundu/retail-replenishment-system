@@ -21,6 +21,19 @@ def test_forward_fill_oil_removes_middle_nulls() -> None:
     assert filled["dcoilwtico"].to_list() == [50.0, 50.0, 52.0]
 
 
+def test_forward_fill_oil_removes_leading_nulls() -> None:
+    oil = pl.DataFrame(
+        {
+            "date": [date(2020, 1, 1), date(2020, 1, 2), date(2020, 1, 3)],
+            "dcoilwtico": [None, 50.0, 52.0],
+        }
+    )
+
+    filled = forward_fill_oil(oil)
+
+    assert filled["dcoilwtico"].to_list() == [50.0, 50.0, 52.0]
+
+
 def test_build_panel_drops_all_zero_and_truncates_prelaunch_zeros() -> None:
     train = pl.DataFrame(
         {
@@ -52,4 +65,3 @@ def test_build_panel_drops_all_zero_and_truncates_prelaunch_zeros() -> None:
     assert result.leading_zero_rows_dropped == 1
     assert result.panel.select("store_nbr").unique().item() == 1
     assert result.panel["date"].to_list() == [date(2020, 1, 2), date(2020, 1, 3)]
-

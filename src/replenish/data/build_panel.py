@@ -4,15 +4,32 @@ from pathlib import Path
 
 from replenish.config.settings import Settings, default_settings
 from replenish.data.loaders import FavoritaTrainLoader, OilLoader
-from replenish.data.panel import build_panel, forward_fill_oil
+from replenish.data.panel import PanelBuildResult, build_panel, forward_fill_oil
 from replenish.data.validators import (
     AllZeroSeriesValidator,
     DailyCalendarValidator,
     LeadingZeroTruncationValidator,
     OilNullValidator,
+    OilRawNullCountValidator,
     TrainRowCountValidator,
+    ValidationResult,
     Validator,
 )
+
+
+def print_panel_summary(result: PanelBuildResult) -> None:
+    print(f"all_zero_series_dropped={result.all_zero_series_count}")
+    print(f"leading_zero_rows_dropped={result.leading_zero_rows_dropped}")
+    print(f"panel_rows={result.panel.height}")
+    print(
+        "panel_series="
+        f"{result.panel.select(['store_nbr', 'family']).unique().height}"
+    )
+
+
+def print_validation_summary(results: list[ValidationResult]) -> None:
+    for result in results:
+        print(f"{result.name}: passed={result.passed}; {result.detail}")
 
 
 def run(settings: Settings) -> None:
@@ -24,6 +41,7 @@ def run(settings: Settings) -> None:
     validators: list[Validator] = [
         TrainRowCountValidator(train, settings.data_quality),
         AllZeroSeriesValidator(train, settings.data_quality),
+        OilRawNullCountValidator(oil, settings.data_quality),
         OilNullValidator(filled_oil),
         DailyCalendarValidator(result.panel),
         LeadingZeroTruncationValidator(result.panel),
@@ -37,6 +55,9 @@ def run(settings: Settings) -> None:
     output_path = Path(settings.paths.panel)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     result.panel.write_parquet(output_path)
+    print_panel_summary(result)
+    print_validation_summary(results)
+    print(f"panel_written={output_path}")
 
 
 def main() -> None:

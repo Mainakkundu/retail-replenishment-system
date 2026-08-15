@@ -15,7 +15,9 @@ class PanelBuildResult:
 
 
 def forward_fill_oil(oil: pl.DataFrame) -> pl.DataFrame:
-    return oil.sort("date").with_columns(pl.col("dcoilwtico").forward_fill())
+    return oil.sort("date").with_columns(
+        pl.col("dcoilwtico").forward_fill().backward_fill()
+    )
 
 
 def count_all_zero_series(train: pl.DataFrame) -> int:
@@ -83,4 +85,3 @@ def build_panel(train: pl.DataFrame, config: DataQualityConfig) -> PanelBuildRes
         all_zero_series_count=all_zero_series_count,
         leading_zero_rows_dropped=leading_zero_rows_dropped,
     )
-

@@ -10,6 +10,7 @@ from replenish.data.validators import (
     DailyCalendarValidator,
     LeadingZeroTruncationValidator,
     OilNullValidator,
+    OilRawNullCountValidator,
     TrainRowCountValidator,
 )
 
@@ -29,6 +30,16 @@ def test_oil_null_validator_fails_when_nulls_remain() -> None:
     result = OilNullValidator(oil).validate()
 
     assert not result.passed
+
+
+def test_oil_raw_null_count_validator_passes_expected_count() -> None:
+    oil = pl.DataFrame({"dcoilwtico": [50.0, None, None]})
+    result = OilRawNullCountValidator(
+        oil,
+        DataQualityConfig(expected_oil_nulls_before_fill=2),
+    ).validate()
+
+    assert result.passed
 
 
 def test_daily_calendar_validator_detects_gap() -> None:
@@ -72,4 +83,3 @@ def test_leading_zero_truncation_validator_detects_prelaunch_zero() -> None:
     result = LeadingZeroTruncationValidator(panel).validate()
 
     assert not result.passed
-

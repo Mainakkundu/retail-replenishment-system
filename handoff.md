@@ -21,6 +21,13 @@
   - tests under `tests/`
   - README with Kaggle download instructions
 - Constitution updated to allow pandas, NumPy, Polars, and DuckDB.
+- Favorita archive placed under `data/raw/favorita/` and extracted locally.
+- P0 panel built at `data/interim/panel.parquet`.
+- Oil handling fixed for the leading null on `2013-01-01` by filling from the
+  first known oil value after forward-fill.
+- Raw oil null-count validator added so the expected 43 nulls are checked before
+  fill, and zero nulls are checked after fill.
+- Build command now prints P0 validator/count summaries.
 
 ## Verification already run
 
@@ -28,44 +35,33 @@
 .venv/bin/python -m pytest
 .venv/bin/ruff check src tests
 .venv/bin/mypy src
+PYTHONPATH=src .venv/bin/python -m replenish.data.build_panel
 ```
 
-All passed after the latest completed commit.
+All passed after the latest local changes.
 
-## Current blocker
+Real-data P0 validation observed:
 
-The Favorita data has not been downloaded. Kaggle download failed because
-`kaggle.json` was missing.
-
-Expected credential path:
-
-```text
-data/raw/favorita/.kaggle/kaggle.json
+```
+raw_train_rows=3000888
+all_zero_series_count=53
+leading_zero_rows_dropped=468052
+oil_nulls_before_fill=43
+oil_nulls_after_fill=0
+panel_rows=2450500
+panel_series=1729
+panel_sha256=0cea9827f4c70895182c29d53df2cf272f57a1c0201ae1f9b7fc293aa7188f72
 ```
 
-Expected raw data files after download and unzip:
-
-```text
-data/raw/favorita/train.csv
-data/raw/favorita/stores.csv
-data/raw/favorita/oil.csv
-data/raw/favorita/holidays_events.csv
-data/raw/favorita/transactions.csv
-```
+Two consecutive panel builds produced the same SHA-256 hash.
 
 ## Next step
 
-Once Kaggle credentials are present, download/unzip the Kaggle competition data,
-then run:
-
-```text
-.venv/bin/python -m replenish.data.build_panel
-```
-
-After that, validate the P0 exit criteria from `roadmap.md`.
+Report the P0 exit criteria status and ask whether to push `p0-setup`. After the
+user approves moving on, create/switch to `p1-ts-eda` and start
+`notebooks/01_eda_features.ipynb` § time series only.
 
 ## Git workflow reminder
 
 Work on one branch per phase. Do not merge into `main` without user review and
 explicit approval.
-
