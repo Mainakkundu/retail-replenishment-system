@@ -5,3 +5,5 @@ pyarrow==21.0.0
 pydantic==2.11.7
 matplotlib==3.9.4
 statsmodels==0.14.4
+lightgbm==4.6.0
+prophet==1.3.0
