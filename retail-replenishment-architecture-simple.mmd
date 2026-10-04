@@ -1,0 +1,72 @@
+%%{init: {
+  "securityLevel": "loose",
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Inter, Arial, sans-serif",
+    "fontSize": "18px",
+    "primaryTextColor": "#172033",
+    "lineColor": "#526178",
+    "clusterBkg": "#FFFCF5",
+    "clusterBorder": "#B87918",
+    "edgeLabelBackground": "#FFFFFF"
+  },
+  "flowchart": {
+    "curve": "basis",
+    "nodeSpacing": 42,
+    "rankSpacing": 65,
+    "htmlLabels": true
+  }
+}}%%
+flowchart LR
+    DEMAND["<b>Real demand history</b><br/>Favorita sales · promotions<br/>holidays · stores"]
+    OPS["<b>Operational mechanics</b><br/>simulated for replay<br/>inventory · POs · suppliers"]
+
+    subgraph HARNESS["RETAIL DEMAND & REPLENISHMENT · DECISION ENGINEERING HARNESS<br/><small>Deterministic forecasting and ordering around one bounded agent</small>"]
+        direction LR
+        PANEL["<b>Validated panel</b><br/>Polars · Parquet<br/>daily store-family demand"]
+        FCST["<b>Quantile forecasts</b><br/>statsmodels · Prophet<br/>LightGBM"]
+        ORDER["<b>Replenishment engine</b><br/>MinT · newsvendor<br/>MOQ · shelf life · cost"]
+        EXC["<b>Exception detector</b><br/>stockout · overstock<br/>delay · drift"]
+        SUP["<b>Exception supervisor</b><br/><i>What should I inspect<br/>or compare next?</i><br/><small>only agentic component</small>"]
+        TOOLS["<b>Typed tools</b><br/>forecast · inventory · PO<br/>supplier · scenario"]
+        GATE{"<b>Policy gate</b><br/>engine quantity?<br/>evidence sufficient?<br/>approval required?"}
+        CTRL["<b>Harness controls</b><br/>schemas · no-lookahead<br/>seeds · limits · audit"]
+
+        PANEL --> FCST --> ORDER --> EXC
+        EXC -->|"high-impact cases only"| SUP
+        SUP <-->|"structured evidence"| TOOLS
+        SUP -->|"recommendation"| GATE
+        CTRL -. "governs" .-> FCST
+        CTRL -. "constrains" .-> SUP
+        CTRL -. "enforces" .-> GATE
+    end
+
+    ERP["<img src='https://raw.githubusercontent.com/frappe/erpnext/develop/erpnext/public/images/v16/erpnext.svg' width='80'/><br/><b>ERPNext</b><br/>items · warehouses · suppliers<br/>POs · receipts · material requests"]
+    PLANNER["<b>Replenishment planner</b><br/>review cost and service trade-off<br/>approve · reject · modify"]
+    PHOENIX["<img src='https://raw.githubusercontent.com/deepset-ai/haystack-integrations/main/logos/arize-phoenix.png' width='78'/><br/><b>Arize Phoenix</b><br/>run · tool · gate audit trail"]
+
+    DEMAND --> PANEL
+    OPS --> ORDER
+    TOOLS <-->|"production reads"| ERP
+    GATE -->|"review"| PLANNER
+    PLANNER -->|"approved draft Material Request"| ERP
+    HARNESS -. "forecast, decision, tool and gate spans" .-> PHOENIX
+
+    classDef input fill:#E8F0FE,stroke:#3B63B8,color:#172033,stroke-width:2px;
+    classDef deterministic fill:#E9F7EF,stroke:#2E7D52,color:#153923,stroke-width:2px;
+    classDef agent fill:#FFF0CF,stroke:#B87918,color:#3D2A0A,stroke-width:3px;
+    classDef control fill:#FFF8E8,stroke:#9B6A1D,color:#3D2A0A,stroke-width:2px;
+    classDef gate fill:#FDECEF,stroke:#A74A5D,color:#451E27,stroke-width:2px;
+    classDef data fill:#F2ECFA,stroke:#7154A3,color:#2C2140,stroke-width:2px;
+    classDef output fill:#E7F6F4,stroke:#277C74,color:#153D39,stroke-width:2px;
+    classDef audit fill:#EAF7FB,stroke:#217A94,color:#153D49,stroke-width:2px;
+
+    class DEMAND,OPS input;
+    class PANEL,FCST,ORDER,EXC,TOOLS deterministic;
+    class SUP agent;
+    class CTRL control;
+    class GATE gate;
+    class ERP data;
+    class PLANNER output;
+    class PHOENIX audit;
+    style HARNESS fill:#FFFCF5,stroke:#B87918,stroke-width:3px,stroke-dasharray:10 7
