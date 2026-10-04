@@ -1,6 +1,14 @@
-# Favorita Replenishment Forecasting
+# Retail Demand & Replenishment Decision System
 
-Current phase: P0 setup and data foundation.
+A phase-gated system for hierarchical probabilistic demand forecasting,
+cost-aware replenishment decisions, and planner-facing exception investigation.
+
+Implemented on `main`: P0 data foundation and P1 time-series EDA. Forecasting,
+reconciliation, inventory simulation, ordering policies, historical replay, and
+the agentic extension follow the repository roadmap.
+
+See the [technical one-pager](TECHNICAL_OVERVIEW.md) for the architecture,
+evaluation design, ERP integration, and operating persona.
 
 The raw data contract is defined in `constitution.md`: Favorita competition CSVs
 must live under `data/raw/favorita/`. The `data/` and `outputs/` trees are
@@ -23,4 +31,3 @@ After unzipping the archive, build the P0 panel:
 ```bash
 .venv/bin/python -m replenish.data.build_panel
 ```
-
